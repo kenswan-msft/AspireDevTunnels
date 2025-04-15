@@ -6,7 +6,7 @@ IResourceBuilder<ProjectResource> apiService =
     builder.AddProject<Projects.AspireDevTunnels_ApiService>("apiservice");
 
 // Feature Entry
-apiService.WithDevTunnel("sample-devtunnel-api", 7071);
+apiService.WithDevTunnel("sample-devtunnel-api", 7565);
 
 builder.AddProject<Projects.AspireDevTunnels_Web>("webfrontend")
     .WithExternalHttpEndpoints()
