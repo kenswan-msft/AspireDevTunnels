@@ -1,0 +1,19 @@
+<Project>
+
+  <PropertyGroup Label="Build Settings">
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Compile Settings">
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Documentation Settings">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <!-- Missing XML comment for publicly visible type or member -->
+	  <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>
