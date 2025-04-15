@@ -32,9 +32,14 @@ Prototype for .NET Aspire DevTunnel Feature
 
 ## Issues
 
-1. Get Consistent Dev Tunnel Url through Aspire Pipeline/builder configuration
-   1. Could surface this URL through dashboard if unable to make consistent
-1. Configure port connection through Aspire Pipeline/builder configuration
+1. Auto-configure port connection to DT cli from project resource launch settings
+1. Allow option for persistent vs. temporary tunnels
+1. Allow option for public vs. private tunnels
+1. Get Consistent Dev Tunnel Url through Aspire builder configuration
+   - Could surface this URL through dashboard if unable to make consistent
+
+## Troubleshooting
+
 1. Logging in and requesting through browser works, but missing for:
-   1. Visual Studio http files
-   1. Rest Client IDEs
+   1. Visual Studio http files (receiving 200OK for sign in page)
+   1. Rest Client IDEs (receiving 200OK for sign in page)
