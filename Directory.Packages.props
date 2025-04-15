@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup Label="External Testing Packages">
-    <PackageVersion Include="Bogus" Version="35.6.1" />
+    <PackageVersion Include="Bogus" Version="35.6.3" />
   </ItemGroup>
 
 </Project>

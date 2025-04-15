@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SampleShop.ServiceDefaults\SampleShop.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\AspireDevTunnels.ServiceDefaults\AspireDevTunnels.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>

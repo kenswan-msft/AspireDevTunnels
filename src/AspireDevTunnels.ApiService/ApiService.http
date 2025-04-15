@@ -1,0 +1,8 @@
+# @baseAddress=https://localhost:7565
+@baseAddress=https://sample-shop-api-7071.devtunnels.ms
+
+### Get OpenApi Spec
+GET {{baseAddress}}/openapi/v1.json
+
+### Weather Forecast
+GET {{baseAddress}}/weatherforecast
