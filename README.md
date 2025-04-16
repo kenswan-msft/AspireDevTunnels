@@ -20,11 +20,11 @@ Prototype for .NET Aspire DevTunnel Feature
 
 ### 2. Create Port
 
-`devtunnel create`
+`devtunnel create <tunnel id>`
 
 ### 3. Add Port
 
-`devtunnel port add -p 7565 --protocol https`
+`devtunnel port add -p <port number> --protocol https`
 
 ### 4. Startup
 
