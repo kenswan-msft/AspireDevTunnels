@@ -2,7 +2,7 @@ namespace AspiresDevTunnels.Tests;
 
 public class WebTests(ITestContextAccessor testContextAccessor)
 {
-    [Fact]
+    [Fact(Skip = "This test has dependency on Microsoft.devtunnels installation and login. Need to configure in CI/CD pipeline")]
     public async Task GetWebResourceRootReturnsOkStatusCode()
     {
         // Arrange
