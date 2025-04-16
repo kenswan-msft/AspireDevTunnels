@@ -2,14 +2,14 @@
 {
     public interface IDevTunnelService
     {
-        void CreateTunnel(string tunnelName);
+        Task CreateTunnelAsync(string tunnelName, CancellationToken cancellationToken = default);
 
-        void AddPort(int portNumber, string protocol = "https");
+        Task AddPortAsync(int portNumber, string protocol = "https", CancellationToken cancellationToken = default);
 
-        string GetAuthToken(string tunnelName);
+        Task<string> GetAuthTokenAsync(string tunnelName, CancellationToken cancellationToken = default);
 
-        void StartTunnel();
+        Task StartTunnelAsync(CancellationToken cancellationToken = default);
 
-        void StopTunnel();
+        Task StopTunnelAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -29,27 +29,23 @@
 
         public ProjectResource AssociatedProjectResource { get; }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            devTunnelService.CreateTunnel(TunnelName);
-            devTunnelService.AddPort(Port, Scheme);
-            devTunnelService.StartTunnel();
-
-            return Task.CompletedTask;
+            await devTunnelService.CreateTunnelAsync(TunnelName, cancellationToken);
+            await devTunnelService.AddPortAsync(Port, Scheme, cancellationToken);
+            await devTunnelService.StartTunnelAsync(cancellationToken);
         }
 
-        public Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
+        public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
         {
-            string token = devTunnelService.GetAuthToken(TunnelName);
+            string token = await devTunnelService.GetAuthTokenAsync(TunnelName, cancellationToken);
 
-            return Task.FromResult(token);
+            return token;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            devTunnelService.StopTunnel();
-
-            return Task.CompletedTask;
+            return devTunnelService.StopTunnelAsync(cancellationToken);
         }
     }
 }

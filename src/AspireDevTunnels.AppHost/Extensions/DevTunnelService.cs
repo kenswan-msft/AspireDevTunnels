@@ -4,7 +4,7 @@ namespace AspireDevTunnels.AppHost.Extensions
 {
     internal class DevTunnelService : IDevTunnelService
     {
-        public void CreateTunnel(string tunnelName)
+        public async Task CreateTunnelAsync(string tunnelName, CancellationToken cancellationToken = default)
         {
             List<string> commandLineArgs = [
                 "create",
@@ -12,10 +12,10 @@ namespace AspireDevTunnels.AppHost.Extensions
                 "--json"
             ];
 
-            RunProcess(commandLineArgs);
+            await RunProcessAsync(commandLineArgs, waitForExit: true, collectInputCallback: null, cancellationToken);
         }
 
-        public void AddPort(int portNumber, string protocol = "https")
+        public async Task AddPortAsync(int portNumber, string protocol = "https", CancellationToken cancellationToken = default)
         {
             List<string> commandLineArgs = [
                 "port",
@@ -26,10 +26,10 @@ namespace AspireDevTunnels.AppHost.Extensions
                 protocol
             ];
 
-            RunProcess(commandLineArgs);
+            await RunProcessAsync(commandLineArgs, waitForExit: true, collectInputCallback: null, cancellationToken);
         }
 
-        public string GetAuthToken(string tunnelName)
+        public async Task<string> GetAuthTokenAsync(string tunnelName, CancellationToken cancellationToken = default)
         {
             List<string> commandLineArgs = [
                 "token",
@@ -41,36 +41,36 @@ namespace AspireDevTunnels.AppHost.Extensions
 
             string token = string.Empty;
 
-            RunProcess(commandLineArgs, (input) =>
+            await RunProcessAsync(commandLineArgs, waitForExit: true, (input) =>
             {
                 if (input.Contains("\"token\":"))
                 {
                     token = input.Replace("\"token\": \"", string.Empty).Replace("\"", string.Empty);
                 }
-            });
+            }, cancellationToken);
 
             return token;
         }
 
-        public void StartTunnel()
+        public async Task StartTunnelAsync(CancellationToken cancellationToken = default)
         {
             List<string> commandLineArgs = [
                 "host",
             ];
 
-            RunProcess(commandLineArgs);
+            await RunProcessAsync(commandLineArgs, waitForExit: false, collectInputCallback: null, cancellationToken);
         }
 
-        public void StopTunnel()
+        public Task StopTunnelAsync(CancellationToken cancellationToken = default)
         {
-            //List<string> commandLineArgs = [
-            //    "stop",
-            //];
-
-            //RunProcess(commandLineArgs);
+            throw new NotImplementedException();
         }
 
-        private static void RunProcess(List<string> commandLineArgs, Action<string> collectInputCallback = null)
+        private static async Task RunProcessAsync(
+            List<string> commandLineArgs,
+            bool waitForExit = true,
+            Action<string> collectInputCallback = null,
+            CancellationToken cancellationToken = default)
         {
             ProcessStartInfo startInfo = new()
             {
@@ -112,7 +112,11 @@ namespace AspireDevTunnels.AppHost.Extensions
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
-            process.WaitForExit(milliseconds: 5000);
+
+            if (waitForExit)
+            {
+                await process.WaitForExitAsync(cancellationToken);
+            }
         }
     }
 }
