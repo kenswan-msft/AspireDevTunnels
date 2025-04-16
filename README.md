@@ -73,3 +73,16 @@ OpenApi Spec Behind Tunnel
   }
 }
 ```
+
+`devtunnel token sample-devtunnel-api --scopes connect --json`
+
+```json
+{
+  "tunneldId": "sample-devtunnel-api.usw2",
+  "ports": [],
+  "scope": "connect",
+  "lifeTime": "1.00:00:00",
+  "expiration": "2025-04-17 20:35:16 UTC",
+  "token": "eyJhbGciOiJFUzI1N..."
+}
+```
