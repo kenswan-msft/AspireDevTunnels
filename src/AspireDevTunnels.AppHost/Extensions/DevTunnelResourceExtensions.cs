@@ -52,6 +52,10 @@
 
                         devTunnelResource.Annotations.Add(new EnvironmentCallbackAnnotation("TUNNEL_TOKEN", () => authToken));
                     }
+                    else
+                    {
+                        await devTunnelResource.AllowAnonymousAccessAsync(cancellationToken);
+                    }
 
                     Console.WriteLine($"Tunnel Ready At: {devTunnelResource.TunnelUrl}");
                 });

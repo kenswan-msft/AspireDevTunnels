@@ -52,6 +52,17 @@ namespace AspireDevTunnels.AppHost.Extensions
             return token;
         }
 
+        public async Task AllowAnonymousAccessAsync(string tunnelName, CancellationToken cancellationToken = default)
+        {
+            List<string> commandLineArgs = [
+                "access",
+                "create",
+                tunnelName,
+                "--anonymous"
+            ];
+            await RunProcessAsync(commandLineArgs, waitForExit: true, collectInputCallback: null, cancellationToken);
+        }
+
         public async Task StartTunnelAsync(CancellationToken cancellationToken = default)
         {
             List<string> commandLineArgs = [

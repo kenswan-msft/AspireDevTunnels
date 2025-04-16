@@ -43,6 +43,11 @@
             return token;
         }
 
+        public async Task AllowAnonymousAccessAsync(CancellationToken cancellationToken)
+        {
+            await devTunnelService.AllowAnonymousAccessAsync(TunnelName, cancellationToken);
+        }
+
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return devTunnelService.StopTunnelAsync(cancellationToken);
