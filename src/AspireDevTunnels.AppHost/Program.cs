@@ -13,6 +13,7 @@ apiService.WithDevTunnel(options =>
     options.Port = 1234;
     options.IsPersistent = true;
     options.DashBoardRelativeUrl = "/openapi/v1.json";
+    options.Region = "use";
 });
 
 builder.AddProject<Projects.AspireDevTunnels_Web>("webfrontend")

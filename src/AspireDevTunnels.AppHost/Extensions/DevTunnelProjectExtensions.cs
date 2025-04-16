@@ -21,7 +21,10 @@ public static class DevTunnelProjectExtensions
         // TODO: Dynamic port generation if not specified
         int portNumber = devTunnelOptions.Port ?? 1234;
 
-        string tunnelUrl = $"https://{tunnelName}-{portNumber}.usw2.devtunnels.ms";
+        // TODO: Detect current region from the devtunnel CLI output
+        string region = devTunnelOptions.Region ?? "usw2";
+
+        string tunnelUrl = $"https://{tunnelName}-{portNumber}.{devTunnelOptions.Region}.devtunnels.ms";
 
         resourceBuilder.WithEndpoint(tunnelName, endpoint =>
         {

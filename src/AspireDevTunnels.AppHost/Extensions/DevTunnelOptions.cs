@@ -11,5 +11,7 @@
         public bool IsPublic { get; set; } = true;
 
         public string DashBoardRelativeUrl { get; set; } = "/";
+
+        public string Region { get; set; } = "usw2";
     }
 }
