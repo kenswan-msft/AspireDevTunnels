@@ -7,39 +7,69 @@ Prototype for .NET Aspire DevTunnel Feature
 - [.NET Aspire](https://github.com/dotnet/aspire) (9.2.0)
 - [DevTunnels CLI](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/cli-commands) ([install](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started?tabs=windows))
 
+## Exposure
+
+Dashboard
+
+![DevTunnel Exposure](./docs/images/apspire-tunnel-dashboard.png)
+
+OpenApi Spec Behind Tunnel
+
+![DevTunnel Exposure](./docs/images/aspire-tunnel-url.png)
+
+## Key Files
+
+- [DevTunnelProjectExtensions.cs](./src/AspireDevTunnels.AppHost/Extensions/DevTunnelProjectExtensions.cs)
+- [Program.cs](./src/AspireDevTunnels.AppHost/Program.cs)
+
 ## Resources
 
 - [Microsoft/Dev-Tunnels GitHub](https://github.com/microsoft/dev-tunnels)
 - [Microsoft Build - Advanced Dev Tunnel Features](https://www.youtube.com/watch?v=yCYLurylgj8)
 
-## DevTunnel Startup Steps
+## DevTunnel Dependency
 
-### 1. Login
+### User Login
 
 `devtunnel user login`
 
-### 2. Create Port
-
-`devtunnel create <tunnel id>`
-
-### 3. Add Port
-
-`devtunnel port add -p <port number> --protocol https`
-
-### 4. Startup
-
-`devtunnel host`
-
 ## Issues
 
-1. Auto-configure port connection to DT cli from project resource launch settings
-1. Allow option for persistent vs. temporary tunnels
-1. Allow option for public vs. private tunnels
-1. Get Consistent Dev Tunnel Url through Aspire builder configuration
-   - Could surface this URL through dashboard if unable to make consistent
+1. Dynamic port selection when not specified
+1. Persistent vs. Temporary Tunnel creation
+1. Private Tunnel support
+1. DevTunnel login support (currently depends on `devtunnel user login` before startup)
 
-## Troubleshooting
+## Sample CLI Responses
 
-1. Logging in and requesting through browser works, but missing for:
-   1. Visual Studio http files (receiving 200OK for sign in page)
-   1. Rest Client IDEs (receiving 200OK for sign in page)
+`devtunnel create sample-devtunnel-api --json`:
+
+```json
+{
+  "tunnel": {
+    "tunnelId": "sample-devtunnel-api.usw2",
+    "hostConnections": 0,
+    "clientConnections": 0,
+    "labels": [],
+    "tunnelExpiration": "30 days",
+    "description": "",
+    "currentUploadRate": "0 MB/s (limit: 20 MB/s)",
+    "currentDownloadRate": "0 MB/s (limit: 20 MB/s)",
+    "accessControl": []
+  }
+}
+```
+
+`devtunnel port add -p 1234 --protocol https --json`:
+
+```json
+{
+  "port": {
+    "tunnelId": "sample-devtunnel-api.usw2",
+    "portNumber": 1234,
+    "protocol": "https",
+    "accessControl": [],
+    "clientConnections": 0
+  }
+}
+```

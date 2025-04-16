@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace AspireDevTunnels.AppHost.Extensions;
 
@@ -15,32 +16,30 @@ public static class DevTunnelProjectExtensions
             configureOptions(devTunnelOptions);
         }
 
-        string tunnelName = devTunnelOptions.TunnelName ?? "sample-devtunnel-api";
+        string tunnelName = devTunnelOptions.TunnelId ?? "aspire-devtunnel-api";
 
-        // TODO: Get port from resource launch port if no port is specified
-        // This will be used for the tunnel integration port configuration
+        // TODO: Dynamic port generation if not specified
         int portNumber = devTunnelOptions.Port ?? 1234;
 
-        if (devTunnelOptions.Port.HasValue)
-        {
-            resourceBuilder.WithEndpoint(tunnelName, endpoint =>
-            {
-                endpoint.Port = portNumber;
-                endpoint.UriScheme = "https";
-                endpoint.IsExternal = true;
-                endpoint.IsProxied = false;
-                endpoint.Name = tunnelName;
-                endpoint.TargetPort = portNumber;
-            });
-        }
+        string tunnelUrl = $"https://{tunnelName}-{portNumber}.usw2.devtunnels.ms";
 
-        // TODO: Get Url from Dev Tunnel Integration
+        resourceBuilder.WithEndpoint(tunnelName, endpoint =>
+        {
+            endpoint.Port = portNumber;
+            // TODO: Get scheme from active launch profile
+            endpoint.UriScheme = "https";
+            endpoint.IsExternal = true;
+            endpoint.IsProxied = false;
+            endpoint.Name = tunnelName;
+            endpoint.TargetPort = portNumber;
+        });
+
         resourceBuilder.WithUrls(context =>
         {
             context.Urls.Add(new ResourceUrlAnnotation
             {
-                Url = $"https://{tunnelName}-{portNumber}.devtunnels.ms",
-                DisplayText = resourceBuilder.Resource.Name + " DevTunnel URL"
+                Url = tunnelUrl + devTunnelOptions.DashBoardRelativeUrl,
+                DisplayText = resourceBuilder.Resource.Name + " Tunnel"
             });
         });
 
@@ -49,8 +48,85 @@ public static class DevTunnelProjectExtensions
             .AddKeyedSingleton<IDevTunnelService, DevTunnelService>(tunnelName)
             .AddOptions<DevTunnelOptions>(tunnelName);
 
-        // TODO: Add entry to configure tunnel on startup
+        // TODO: Add operations to resource startup event bindings
+        CreateTunnel(tunnelName);
+        AddPort(portNumber, "https");
+        RunHost();
 
         return resourceBuilder;
+    }
+
+    private static void CreateTunnel(string tunnelName)
+    {
+        List<string> commandLineArgs = [
+            "create",
+            tunnelName,
+            "--json"
+        ];
+
+        RunProcess(commandLineArgs);
+    }
+
+    private static void AddPort(int portNumber, string protocol = "https")
+    {
+        List<string> commandLineArgs = [
+            "port",
+            "add",
+            "-p",
+            portNumber.ToString(),
+            "--protocol",
+            protocol
+        ];
+
+        RunProcess(commandLineArgs);
+    }
+
+    private static void RunHost()
+    {
+        List<string> commandLineArgs = [
+            "host",
+        ];
+
+        RunProcess(commandLineArgs);
+    }
+
+    private static void RunProcess(List<string> commandLineArgs)
+    {
+        ProcessStartInfo startInfo = new()
+        {
+            FileName = "devtunnel",
+            Arguments = string.Join(" ", commandLineArgs),
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using Process process = new()
+        {
+            StartInfo = startInfo,
+            EnableRaisingEvents = true
+        };
+
+        process.OutputDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                Console.WriteLine(e.Data);
+            }
+        };
+
+        process.ErrorDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                Console.WriteLine("Error: " + e.Data);
+            }
+        };
+
+        process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        process.WaitForExit(milliseconds: 5000);
     }
 }
