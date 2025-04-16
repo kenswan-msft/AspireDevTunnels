@@ -11,7 +11,7 @@ apiService.WithDevTunnel(port: 1234, region: "use");
 
 builder.AddProject<Projects.AspireDevTunnels_Web>("webfrontend")
     // you can view this entry at "https://webfrontend-tunnel-<port>.<region>.devtunnels.ms"
-    .WithDevTunnel(port: 1235, region: "use")
+    // .WithDevTunnel(port: 1235, region: "use")
     .WithExternalHttpEndpoints()
     .WithReference(apiService)
     .WaitFor(apiService);

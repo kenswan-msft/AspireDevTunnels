@@ -32,13 +32,8 @@
                 // TODO: URL Not Showing in Dashboard
                 .WithUrl(displayText: $"{devResourceName} Url", url: devTunnelResource.TunnelUrl)
                 // TODO: Env variables not showing in dashboard
-                .WithEnvironment(environmentCallbackContext =>
-                {
-                    environmentCallbackContext.EnvironmentVariables.Add("TUNNEL_URL", devTunnelResource.TunnelUrl);
-
-                    // TODO: Get Token and add here when auth required
-                    environmentCallbackContext.EnvironmentVariables.Add("TUNNEL_TOKEN", "N/A");
-                })
+                .WithEnvironment("TUNNEL_URL", devTunnelResource.TunnelUrl)
+                .WithEnvironment("TUNNEL_TOKEN", "N/A")
                 .WithReferenceRelationship(resourceBuilder.Resource);
 
             resourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeStartEvent>(
@@ -46,6 +41,11 @@
                 {
                     // Start the tunnel
                     await devTunnelResource.StartAsync(cancellationToken);
+
+                    // IResource devTunnelResource = context.Model.Resources.First(resource => resource.Name == devResourceName);
+                    // resource.Annotations.Add(new EnvironmentAnnotation("TUNNEL_TOKEN", ""));
+
+                    Console.WriteLine($"Tunnel URL: {devTunnelResource.TunnelUrl}");
                 });
 
             return resourceBuilder;
