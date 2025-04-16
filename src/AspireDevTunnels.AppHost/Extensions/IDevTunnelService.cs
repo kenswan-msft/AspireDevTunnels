@@ -6,6 +6,8 @@
 
         void AddPort(int portNumber, string protocol = "https");
 
+        string GetAuthToken(string tunnelName);
+
         void StartTunnel();
 
         void StopTunnel();

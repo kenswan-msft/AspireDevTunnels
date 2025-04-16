@@ -8,8 +8,8 @@ namespace AspireDevTunnels.AppHost.Extensions
         {
             List<string> commandLineArgs = [
                 "create",
-            tunnelName,
-            "--json"
+                tunnelName,
+                "--json"
             ];
 
             RunProcess(commandLineArgs);
@@ -19,21 +19,44 @@ namespace AspireDevTunnels.AppHost.Extensions
         {
             List<string> commandLineArgs = [
                 "port",
-            "add",
-            "-p",
-            portNumber.ToString(),
-            "--protocol",
-            protocol
+                "add",
+                "-p",
+                portNumber.ToString(),
+                "--protocol",
+                protocol
             ];
 
             RunProcess(commandLineArgs);
+        }
+
+        public string GetAuthToken(string tunnelName)
+        {
+            List<string> commandLineArgs = [
+                "token",
+                tunnelName,
+                "--scopes",
+                "connect",
+                "--json"
+            ];
+
+            string token = string.Empty;
+
+            RunProcess(commandLineArgs, (input) =>
+            {
+                if (input.Contains("\"token\":"))
+                {
+                    token = input.Replace("\"token\": \"", string.Empty).Replace("\"", string.Empty);
+                }
+            });
+
+            return token;
         }
 
         public void StartTunnel()
         {
             List<string> commandLineArgs = [
                 "host",
-        ];
+            ];
 
             RunProcess(commandLineArgs);
         }
@@ -47,7 +70,7 @@ namespace AspireDevTunnels.AppHost.Extensions
             //RunProcess(commandLineArgs);
         }
 
-        private static void RunProcess(List<string> commandLineArgs)
+        private static void RunProcess(List<string> commandLineArgs, Action<string> collectInputCallback = null)
         {
             ProcessStartInfo startInfo = new()
             {
@@ -69,6 +92,11 @@ namespace AspireDevTunnels.AppHost.Extensions
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
+                    if (collectInputCallback is not null)
+                    {
+                        collectInputCallback(e.Data);
+                    }
+
                     Console.WriteLine(e.Data);
                 }
             };
