@@ -23,8 +23,9 @@ OpenApi Spec Behind Tunnel
 
 ## Key Files
 
-- [DevTunnelProjectExtensions.cs](./src/AspireDevTunnels.AppHost/Extensions/DevTunnelProjectExtensions.cs)
-- [Program.cs](./src/AspireDevTunnels.AppHost/Program.cs)
+- [Feature Entry - Program.cs](./src/AspireDevTunnels.AppHost/Program.cs)
+- [Feature Integration - DevTunnelResourceExtensions.cs](./src/AspireDevTunnels.AppHost/Extensions/DevTunnelResourceExtensions.cs)
+- [Tunnel Implementations - MSDevTunnel.cs](./src/AspireDevTunnels.AppHost/Extensions/MSDevTunnel.cs)
 
 ## Resources
 
