@@ -2,41 +2,20 @@
 {
     public static class DevTunnelResourceExtensions
     {
-        public static IResourceBuilder<ProjectResource> WithDevTunnel(
-            this IResourceBuilder<ProjectResource> resourceBuilder,
-            int port,
+        public static IResourceBuilder<DevTunnelResource> AddDevTunnel(
+            this IDistributedApplicationBuilder builder,
+            string name,
             bool isPrivate = true)
         {
-            string devResourceName = $"{resourceBuilder.Resource.Name}-tunnel";
+            DevTunnelResource devTunnelResource = new(name, isPrivate);
 
-            DevTunnelResource devTunnelResource = new(
-                devResourceName,
-                port,
-                isPrivate,
-                resourceBuilder.Resource);
+            IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder = builder.AddResource(devTunnelResource)
+                .WithArgs(["host"]);
 
-            // Add new Port for associated resource
-            resourceBuilder.WithEndpoint(devTunnelResource.Name, endpoint =>
-            {
-                endpoint.Port = devTunnelResource.Port;
-                // TODO: Get scheme from active launch profile
-                endpoint.UriScheme = devTunnelResource.Scheme;
-                endpoint.IsExternal = true;
-                endpoint.IsProxied = false;
-                endpoint.Name = "tunnel";
-                endpoint.TargetPort = devTunnelResource.Port;
-            });
-
-            IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder = resourceBuilder.ApplicationBuilder
-                .AddResource(devTunnelResource)
-                .WithArgs(["host"])
-                .WithReferenceRelationship(resourceBuilder.Resource);
-
-            devTunnelResourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeStartEvent>(
+            builder.Eventing.Subscribe<BeforeResourceStartedEvent>(devTunnelResource,
                 async (context, cancellationToken) =>
                 {
-                    // Initializing tunnel creation and port binding
-                    // "devtunnel host" command will be executed as part of ExecutableResource process flow to start the tunnel
+                    // Initializing tunnel creation
                     await devTunnelResource.InitializeAsync(cancellationToken);
 
                     devTunnelResourceBuilder
@@ -53,10 +32,45 @@
                     }
                     else
                     {
+                        // Add Button to make anonymous
                         await devTunnelResource.AllowAnonymousAccessAsync(cancellationToken);
                     }
 
                     Console.WriteLine($"Tunnel Ready for Start: {devTunnelResource.TunnelUrl}");
+                });
+
+            return devTunnelResourceBuilder;
+        }
+
+        public static IResourceBuilder<T> WithDevTunnel<T>(
+            this IResourceBuilder<T> resourceBuilder,
+            IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder)
+                where T : IResourceWithEndpoints
+        {
+            // TODO: Check port limits
+
+            // Add new Port for associated resource
+            IEnumerable<EndpointReference> endpoints = resourceBuilder.Resource.GetEndpoints()
+                .Where(endpoint => endpoint.Scheme == "https");
+
+            if (!endpoints.Any())
+            {
+                throw new InvalidOperationException("No HTTPS endpoints found to host.");
+            }
+
+            devTunnelResourceBuilder.WithParentRelationship(resourceBuilder.Resource);
+
+            devTunnelResourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeResourceStartedEvent>(devTunnelResourceBuilder.Resource,
+                async (context, cancellationToken) =>
+                {
+                    foreach (EndpointReference endpoint in endpoints)
+                    {
+                        // Add port to tunnel
+                        await devTunnelResourceBuilder.Resource.AddPortAsync(
+                            endpoint.Port,
+                            endpoint.Scheme,
+                            cancellationToken);
+                    }
                 });
 
             return resourceBuilder;

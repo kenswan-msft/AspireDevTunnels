@@ -7,7 +7,7 @@ namespace AspireDevTunnels.AppHost.Extensions
     {
         public string Id => tunnelId;
         public string Name => tunnelName;
-        public string Url => isInitialized ? $"https://{tunnelId}.devtunnels.ms" : null;
+        public string Url => isInitialized ? GetTunnelUrl() : null;
 
         private string tunnelId;
         private string tunnelName;
@@ -213,7 +213,7 @@ namespace AspireDevTunnels.AppHost.Extensions
             DevTunnel devTunnel =
                 await RunProcessAsync<DevTunnel>(commandLineArgs, cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(devTunnel.Tunnel?.TunnelId))
+            if (!string.IsNullOrWhiteSpace(devTunnel?.Tunnel?.TunnelId))
             {
                 Console.WriteLine($"Found DevTunnel {tunnelName}: {devTunnel.Tunnel.TunnelId}");
 
@@ -239,7 +239,7 @@ namespace AspireDevTunnels.AppHost.Extensions
             DevTunnelPort devTunnelPort =
                 await RunProcessAsync<DevTunnelPort>(commandLineArgs, cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(devTunnelPort.Port?.TunnelId))
+            if (!string.IsNullOrWhiteSpace(devTunnelPort?.Port?.TunnelId))
             {
                 Console.WriteLine($"Found DevTunnel Port {portNumber}: {devTunnelPort.Port.TunnelId}-{devTunnelPort.Port.PortNumber}");
 
@@ -285,8 +285,13 @@ namespace AspireDevTunnels.AppHost.Extensions
 
             await process.WaitForExitAsync(cancellationToken);
 
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine("Error: " + error);
+            }
+
             return process.ExitCode != 0
-                ? throw new InvalidOperationException($"Error: {error}")
+                ? default
                 : !string.IsNullOrWhiteSpace(output) ? JsonSerializer.Deserialize<T>(output, jsonSerializerOptions) : default;
         }
 
@@ -341,6 +346,13 @@ namespace AspireDevTunnels.AppHost.Extensions
             {
                 await process.WaitForExitAsync(cancellationToken);
             }
+        }
+
+        private string GetTunnelUrl()
+        {
+            return string.IsNullOrWhiteSpace(tunnelId)
+                ? throw new ArgumentException("Tunnel ID cannot be null or empty.", nameof(tunnelId))
+                : $"https://{tunnelId}.devtunnels.ms";
         }
     }
 }
