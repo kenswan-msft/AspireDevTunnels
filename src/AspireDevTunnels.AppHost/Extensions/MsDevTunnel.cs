@@ -11,7 +11,6 @@ namespace AspireDevTunnels.AppHost.Extensions
 
         private string tunnelId;
         private string tunnelName;
-        private int? port;
 
         private bool isInitialized => !string.IsNullOrEmpty(tunnelId);
         private readonly JsonSerializerOptions jsonSerializerOptions = new(JsonSerializerDefaults.Web);
@@ -66,11 +65,10 @@ namespace AspireDevTunnels.AppHost.Extensions
         {
             CheckIsInitialized();
 
-            this.port = port;
+            DevTunnelPort existingDevTunnelPort =
+                await CheckIfDevTunnelPortExistsAsync(port, cancellationToken);
 
-            bool devTunnelPortExists = await CheckIfDevTunnelPortExistsAsync(port, cancellationToken);
-
-            if (devTunnelPortExists)
+            if (existingDevTunnelPort is not null)
             {
                 Console.WriteLine($"DevTunnel Port {port} already exists. Skipping addition.");
 
@@ -225,7 +223,7 @@ namespace AspireDevTunnels.AppHost.Extensions
             }
         }
 
-        private async Task<bool> CheckIfDevTunnelPortExistsAsync(int portNumber, CancellationToken cancellationToken)
+        private async Task<DevTunnelPort> CheckIfDevTunnelPortExistsAsync(int portNumber, CancellationToken cancellationToken)
         {
             List<string> commandLineArgs = [
                 "port",
@@ -243,11 +241,11 @@ namespace AspireDevTunnels.AppHost.Extensions
             {
                 Console.WriteLine($"Found DevTunnel Port {portNumber}: {devTunnelPort.Port.TunnelId}-{devTunnelPort.Port.PortNumber}");
 
-                return true;
+                return devTunnelPort;
             }
             else
             {
-                return false;
+                return default;
             }
         }
 

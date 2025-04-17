@@ -60,7 +60,8 @@
 
             devTunnelResourceBuilder.WithParentRelationship(resourceBuilder.Resource);
 
-            devTunnelResourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeResourceStartedEvent>(devTunnelResourceBuilder.Resource,
+            devTunnelResourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeResourceStartedEvent>(
+                devTunnelResourceBuilder.Resource,
                 async (context, cancellationToken) =>
                 {
                     foreach (EndpointReference endpoint in endpoints)
