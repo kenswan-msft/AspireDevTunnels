@@ -11,16 +11,6 @@ Prototype for .NET Aspire DevTunnel Feature
 
 - [microsoft/dev-tunnels - GitHub](https://github.com/microsoft/dev-tunnels)
 
-## Exposure
-
-Dashboard
-
-![DevTunnel Exposure](./docs/images/apspire-tunnel-dashboard.png)
-
-OpenApi Spec Behind Tunnel
-
-![DevTunnel Exposure](./docs/images/aspire-tunnel-url.png)
-
 ## Key Files
 
 - [Feature Entry - Program.cs](./src/AspireDevTunnels.AppHost/Program.cs)
@@ -40,10 +30,28 @@ OpenApi Spec Behind Tunnel
 
 ## Issues
 
+1. Temporary Tunnel support
+1. Public Tunnel support
 1. Dynamic port selection when not specified
-1. Persistent vs. Temporary Tunnel creation
-1. Private Tunnel support
 1. DevTunnel login support (currently depends on `devtunnel user login` before startup)
+
+## Screenshots
+
+Dashboard
+
+![Aspire Dashboard](./docs/images/AspireDashboard-Overview.png)
+
+Console Logs
+
+![Console Logs](./docs/images/DevTunnel-Console-Log.png)
+
+Environment Variables
+
+![Environment Variables](./docs/images/DevTunnel-Environment-Configs.png)
+
+OpenApi Spec Behind Tunnel
+
+![DevTunnel Exposure](./docs/images/OpenApi-Spec-Behind-Tunnel.png)
 
 ## Sample CLI Responses
 
@@ -82,6 +90,7 @@ Add Port
   }
 }
 ```
+
 Get Auth Token
 
 `devtunnel token sample-devtunnel-api --scopes connect --json`

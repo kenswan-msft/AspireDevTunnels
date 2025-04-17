@@ -1,11 +1,11 @@
 ﻿namespace AspireDevTunnels.AppHost.Extensions
 {
-    internal class DevTunnelResource : Resource, IResourceWithEnvironment, IResourceWithEndpoints
+    internal class DevTunnelResource : ExecutableResource
     {
         private readonly IDevTunnelProvider devTunnelProvider = new MsDevTunnel();
 
         public DevTunnelResource(string name, int port, bool isPrivate, ProjectResource projectResource) :
-            base(name)
+            base(name, "devtunnel", "./")
         {
             Port = port;
             IsPrivate = isPrivate;
@@ -22,11 +22,10 @@
 
         public ProjectResource AssociatedProjectResource { get; }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task InitializeAsync(CancellationToken cancellationToken)
         {
             await devTunnelProvider.CreateTunnelAsync(Name, cancellationToken);
             await devTunnelProvider.AddPortAsync(Port, Scheme, cancellationToken);
-            await devTunnelProvider.StartTunnelAsync(cancellationToken);
         }
 
         public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)

@@ -15,9 +15,6 @@
                 isPrivate,
                 resourceBuilder.Resource);
 
-            //devTunnelResource.Annotations.Add(new EnvironmentCallbackAnnotation("TUNNEL_URL", () => devTunnelResource.TunnelUrl));
-            //devTunnelResource.Annotations.Add(new ResourceUrlAnnotation { Url = devTunnelResource.TunnelUrl, DisplayText = $"{devResourceName} Url" });
-
             // Add new Port for associated resource
             resourceBuilder.WithEndpoint(devTunnelResource.Name, endpoint =>
             {
@@ -32,31 +29,34 @@
 
             IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder = resourceBuilder.ApplicationBuilder
                 .AddResource(devTunnelResource)
+                .WithArgs(["host"])
                 .WithReferenceRelationship(resourceBuilder.Resource);
 
             devTunnelResourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeStartEvent>(
                 async (context, cancellationToken) =>
                 {
-                    // Start the tunnel
-                    await devTunnelResource.StartAsync(cancellationToken);
+                    // Initializing tunnel creation and port binding
+                    // "devtunnel host" command will be executed as part of ExecutableResource process flow to start the tunnel
+                    await devTunnelResource.InitializeAsync(cancellationToken);
 
-                    // TODO: URL Not Showing in Dashboard
-                    devTunnelResource.Annotations.Add(
-                        new EnvironmentCallbackAnnotation("TUNNEL_URL", () => devTunnelResource.TunnelUrl));
+                    devTunnelResourceBuilder
+                        .WithUrl(url: devTunnelResource.TunnelUrl, displayText: devTunnelResource.Name)
+                        .WithEnvironment("DEV_TUNNEL_URL", devTunnelResource.TunnelUrl);
 
                     if (devTunnelResource.IsPrivate)
                     {
                         string authToken = await devTunnelResource.GetAccessTokenAsync(cancellationToken);
 
-                        // TODO: Env variables not showing in dashboard
-                        devTunnelResource.Annotations.Add(new EnvironmentCallbackAnnotation("TUNNEL_TOKEN", () => authToken));
+                        devTunnelResourceBuilder
+                            .WithEnvironment("DEV_TUNNEL_AUTH_HEADER_FORMAT", "X-Tunnel-Authorization: tunnel <token>")
+                            .WithEnvironment("DEV_TUNNEL_TOKEN", authToken);
                     }
                     else
                     {
                         await devTunnelResource.AllowAnonymousAccessAsync(cancellationToken);
                     }
 
-                    Console.WriteLine($"Tunnel Ready At: {devTunnelResource.TunnelUrl}");
+                    Console.WriteLine($"Tunnel Ready for Start: {devTunnelResource.TunnelUrl}");
                 });
 
             return resourceBuilder;

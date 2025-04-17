@@ -11,6 +11,7 @@ namespace AspireDevTunnels.AppHost.Extensions
 
         private string tunnelId;
         private string tunnelName;
+        private int? port;
 
         private bool isInitialized => !string.IsNullOrEmpty(tunnelId);
         private readonly JsonSerializerOptions jsonSerializerOptions = new(JsonSerializerDefaults.Web);
@@ -61,15 +62,17 @@ namespace AspireDevTunnels.AppHost.Extensions
             }
         }
 
-        public async Task AddPortAsync(int portNumber, string protocol = "https", CancellationToken cancellationToken = default)
+        public async Task AddPortAsync(int port, string protocol = "https", CancellationToken cancellationToken = default)
         {
             CheckIsInitialized();
 
-            bool devTunnelPortExists = await CheckIfDevTunnelPortExistsAsync(portNumber, cancellationToken);
+            this.port = port;
+
+            bool devTunnelPortExists = await CheckIfDevTunnelPortExistsAsync(port, cancellationToken);
 
             if (devTunnelPortExists)
             {
-                Console.WriteLine($"DevTunnel Port {portNumber} already exists. Skipping addition.");
+                Console.WriteLine($"DevTunnel Port {port} already exists. Skipping addition.");
 
                 return;
             }
@@ -78,7 +81,7 @@ namespace AspireDevTunnels.AppHost.Extensions
                 "port",
                 "add",
                 "-p",
-                portNumber.ToString(),
+                port.ToString(),
                 "--protocol",
                 protocol,
                 "--json",

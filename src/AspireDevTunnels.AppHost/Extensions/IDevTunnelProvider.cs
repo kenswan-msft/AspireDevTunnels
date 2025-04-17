@@ -10,7 +10,7 @@
 
         Task CreateTunnelAsync(string tunnelId, CancellationToken cancellationToken = default);
 
-        Task AddPortAsync(int portNumber, string protocol = "https", CancellationToken cancellationToken = default);
+        Task AddPortAsync(int port, string protocol = "https", CancellationToken cancellationToken = default);
 
         Task<string> GetAuthTokenAsync(CancellationToken cancellationToken = default);
 
