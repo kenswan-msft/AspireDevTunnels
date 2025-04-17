@@ -7,6 +7,10 @@ Prototype for .NET Aspire DevTunnel Feature
 - [.NET Aspire](https://github.com/dotnet/aspire) (9.2.0)
 - [DevTunnels CLI](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/cli-commands) ([install](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started?tabs=windows))
 
+## References
+
+- [microsoft/dev-tunnels - GitHub](https://github.com/microsoft/dev-tunnels)
+
 ## Exposure
 
 Dashboard
@@ -42,6 +46,8 @@ OpenApi Spec Behind Tunnel
 
 ## Sample CLI Responses
 
+Create Tunnel
+
 `devtunnel create sample-devtunnel-api --json`:
 
 ```json
@@ -60,6 +66,8 @@ OpenApi Spec Behind Tunnel
 }
 ```
 
+Add Port
+
 `devtunnel port add -p 1234 --protocol https --json`:
 
 ```json
@@ -73,6 +81,7 @@ OpenApi Spec Behind Tunnel
   }
 }
 ```
+Get Auth Token
 
 `devtunnel token sample-devtunnel-api --scopes connect --json`
 
@@ -85,4 +94,30 @@ OpenApi Spec Behind Tunnel
   "expiration": "2025-04-17 20:35:16 UTC",
   "token": "eyJhbGciOiJFUzI1N..."
 }
+```
+
+Verify User Logged In
+
+`devtunnel user show --json`
+
+```json
+{
+  "status": "Logged in",
+  "provider": "microsoft",
+  "username": "<user emal>",
+  "tenantId": "<tenant id>",
+  "objectId": "<user object id>"
+}
+```
+
+Verify installed
+
+`devtunnel --version`
+
+```json
+Tunnel CLI version: 1.0.1435+d49a94cc24
+
+Tunnel service URI        : https://global.rel.tunnels.api.visualstudio.com/
+Tunnel service version    : 1.0.1427.13095 (2733b94cde; 2025-04-02 01:00:45Z)
+Tunnel service cluster    : usw2
 ```

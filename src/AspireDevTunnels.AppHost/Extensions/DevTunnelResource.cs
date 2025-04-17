@@ -2,28 +2,21 @@
 {
     internal class DevTunnelResource : Resource, IResourceWithEnvironment, IResourceWithEndpoints
     {
-        private readonly IDevTunnelService devTunnelService = new DevTunnelService();
+        private readonly IDevTunnelProvider devTunnelProvider = new MsDevTunnel();
 
-        public DevTunnelResource(string name, int port, string region, bool isPrivate, ProjectResource projectResource) :
+        public DevTunnelResource(string name, int port, bool isPrivate, ProjectResource projectResource) :
             base(name)
         {
-            TunnelName = name;
             Port = port;
-            Region = region;
             IsPrivate = isPrivate;
-            TunnelUrl = $"https://{Name}-{port}.{region}.devtunnels.ms";
             AssociatedProjectResource = projectResource;
         }
 
         public int Port { get; }
 
-        public string TunnelName { get; }
-
         public string Scheme { get; } = "https";
 
-        public string Region { get; }
-
-        public string TunnelUrl { get; }
+        public string TunnelUrl => devTunnelProvider.Url;
 
         public bool IsPrivate { get; }
 
@@ -31,26 +24,26 @@
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await devTunnelService.CreateTunnelAsync(TunnelName, cancellationToken);
-            await devTunnelService.AddPortAsync(Port, Scheme, cancellationToken);
-            await devTunnelService.StartTunnelAsync(cancellationToken);
+            await devTunnelProvider.CreateTunnelAsync(Name, cancellationToken);
+            await devTunnelProvider.AddPortAsync(Port, Scheme, cancellationToken);
+            await devTunnelProvider.StartTunnelAsync(cancellationToken);
         }
 
         public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
         {
-            string token = await devTunnelService.GetAuthTokenAsync(TunnelName, cancellationToken);
+            string token = await devTunnelProvider.GetAuthTokenAsync(cancellationToken);
 
             return token;
         }
 
         public async Task AllowAnonymousAccessAsync(CancellationToken cancellationToken)
         {
-            await devTunnelService.AllowAnonymousAccessAsync(TunnelName, cancellationToken);
+            await devTunnelProvider.AllowAnonymousAccessAsync(cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            return devTunnelService.StopTunnelAsync(cancellationToken);
+            return devTunnelProvider.StopTunnelAsync(cancellationToken);
         }
     }
 }

@@ -5,7 +5,6 @@
         public static IResourceBuilder<ProjectResource> WithDevTunnel(
             this IResourceBuilder<ProjectResource> resourceBuilder,
             int port,
-            string region,
             bool isPrivate = true)
         {
             string devResourceName = $"{resourceBuilder.Resource.Name}-tunnel";
@@ -13,7 +12,6 @@
             DevTunnelResource devTunnelResource = new(
                 devResourceName,
                 port,
-                region,
                 isPrivate,
                 resourceBuilder.Resource);
 
@@ -34,10 +32,6 @@
 
             IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder = resourceBuilder.ApplicationBuilder
                 .AddResource(devTunnelResource)
-                // TODO: URL Not Showing in Dashboard
-                .WithUrl(displayText: $"{devResourceName} Url", url: devTunnelResource.TunnelUrl)
-                // TODO: Env variables not showing in dashboard
-                .WithEnvironment("DEV_TUNNEL_URL", devTunnelResource.TunnelUrl)
                 .WithReferenceRelationship(resourceBuilder.Resource);
 
             devTunnelResourceBuilder.ApplicationBuilder.Eventing.Subscribe<BeforeStartEvent>(
@@ -46,10 +40,15 @@
                     // Start the tunnel
                     await devTunnelResource.StartAsync(cancellationToken);
 
+                    // TODO: URL Not Showing in Dashboard
+                    devTunnelResource.Annotations.Add(
+                        new EnvironmentCallbackAnnotation("TUNNEL_URL", () => devTunnelResource.TunnelUrl));
+
                     if (devTunnelResource.IsPrivate)
                     {
                         string authToken = await devTunnelResource.GetAccessTokenAsync(cancellationToken);
 
+                        // TODO: Env variables not showing in dashboard
                         devTunnelResource.Annotations.Add(new EnvironmentCallbackAnnotation("TUNNEL_TOKEN", () => authToken));
                     }
                     else

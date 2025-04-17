@@ -1,8 +1,9 @@
 #@baseAddress=https://localhost:7565
-@baseAddress=https://aspire-devtunnel-api-1234.usw2.devtunnels.ms
+@baseAddress=https://apiservice-tunnel-1234.usw2.devtunnels.ms
 
 ### Get OpenApi Spec
 GET {{baseAddress}}/openapi/v1.json
+X-Tunnel-Authorization: tunnel <token>
 
 ### Weather Forecast
 GET {{baseAddress}}/weatherforecast
