@@ -1,9 +1,5 @@
 ﻿namespace AspireDevTunnels.AppHost.Commands;
 
-// Command Result Pattern Models
-//public record DevTunnelCommandResult(string Output, string Error, int ExitCode);
-//public record DevTunnelCommandResult<T>(T Value, string Error, int ExitCode);
-
 public class DevTunnelCommandResult(string output, string error, int exitCode)
 {
     public string Output { get; init; } = output;
