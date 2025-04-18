@@ -43,25 +43,17 @@ Console Logs
 
 ![Console Logs](./docs/images/DevTunnel-Console-Log.png)
 
-Environment Variables
-
-![Environment Variables](./docs/images/DevTunnel-Environment-Configs.png)
-
 OpenApi Spec Behind Tunnel
 
 ![DevTunnel Exposure](./docs/images/OpenApi-Spec-Behind-Tunnel.png)
 
-Enable Public Access Option
+Dashboard Options
 
-![DevTunnel Exposure](./docs/images/Anonymous-Access.png)
+- Make Tunnel Endpoints Public
+- Get Active Port URLs
+- Get Auth Token
 
-Anonymous Acceess Confirmation
-
-![DevTunnel Exposure](./docs/images/Anonymous-Access-Confirmation.png)
-
-Anonymous Acceess Success
-
-![DevTunnel Exposure](./docs/images/Anonymous-Access-Success.png)
+![Dashboard Actions](./docs/images/AspireDashboard-Actions.png)
 
 ## Sample CLI Responses
 

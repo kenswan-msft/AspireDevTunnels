@@ -24,17 +24,8 @@ public static class DevTunnelResourceBuilderExtensions
                 await InitializePortsAsync(devTunnelResource, cancellationToken);
             });
 
-        // TODO: Explore different lifecycle events for this operation
-        builder.Eventing.Subscribe<BeforeResourceStartedEvent>(
-            devTunnelResource,
-            async (context, cancellationToken) =>
-            {
-                await AddTunnelMetadataAsync(devTunnelResource, cancellationToken);
-            });
-
-        // Add Public Tunnel Support
         devTunnelResourceBuilder
-            .WithCommand("anonymous-access", "Make Endpoint Public", async (context) =>
+            .WithCommand("allow-anonymous-access", "Make Endpoint Public", async (context) =>
              {
                  await devTunnelResource.AllowAnonymousAccessAsync(context.CancellationToken);
 
@@ -43,13 +34,57 @@ public static class DevTunnelResourceBuilderExtensions
              }, commandOptions: new CommandOptions
              {
                  ConfirmationMessage = "Are you sure you want to make the dev tunnel publicly available?",
-                 Parameter = true,
-                 IconName = "Play",
+                 IconName = "LockOpen",
                  UpdateState = (updateState) =>
                  {
                      return updateState.ResourceSnapshot.State?.Text != "Running" ? ResourceCommandState.Disabled : ResourceCommandState.Enabled;
                  },
              });
+
+        devTunnelResourceBuilder
+            .WithCommand("get-tunnel-urls", "Get URLs", async (context) =>
+            {
+                DevTunnel devTunnel =
+                    await devTunnelResource.GetTunnelDetailsAsync(context.CancellationToken);
+
+                Console.WriteLine($"Tunnel {devTunnelResource.Name} URLs:");
+
+                foreach (DevTunnelActivePort port in devTunnel.Tunnel.Ports)
+                {
+                    Console.WriteLine($"Port {port.PortNumber}: {port.PortUri}");
+                }
+
+                return new ExecuteCommandResult { Success = true };
+
+            }, commandOptions: new CommandOptions
+            {
+                IconName = "LinkMultiple",
+                UpdateState = (updateState) =>
+                {
+                    return updateState.ResourceSnapshot.State?.Text != "Running" ? ResourceCommandState.Disabled : ResourceCommandState.Enabled;
+                },
+            });
+
+        devTunnelResourceBuilder
+           .WithCommand("get-access-token", "Get Access Token", async (context) =>
+           {
+               DevTunnelAccessInfo devTunnelAccessInfo =
+                   await devTunnelResource.GetAuthTokenAsync(context.CancellationToken);
+
+               Console.WriteLine($"{devTunnelResource.Name} Token (and header):");
+
+               Console.WriteLine($"X-Tunnel-Authorization: tunnel {devTunnelAccessInfo.Token}");
+
+               return new ExecuteCommandResult { Success = true };
+
+           }, commandOptions: new CommandOptions
+           {
+               IconName = "Key",
+               UpdateState = (updateState) =>
+               {
+                   return updateState.ResourceSnapshot.State?.Text != "Running" ? ResourceCommandState.Disabled : ResourceCommandState.Enabled;
+               },
+           });
 
         return devTunnelResourceBuilder;
     }
@@ -147,54 +182,5 @@ public static class DevTunnelResourceBuilderExtensions
                 }
             }
         }
-    }
-
-    private static async Task AddTunnelMetadataAsync(DevTunnelResource devTunnelResource, CancellationToken cancellationToken = default)
-    {
-        Console.WriteLine($"Adding tunnel metadata for {devTunnelResource.Name}...");
-
-        DevTunnel devTunnel =
-            await devTunnelResource.GetTunnelDetailsAsync(cancellationToken);
-
-        if (devTunnel is null)
-        {
-            Console.WriteLine($"Tunnel {devTunnelResource.Name} not found. Skipping metadata addition.");
-            return;
-        }
-
-        foreach (DevTunnelActivePort port in devTunnel.Tunnel.Ports)
-        {
-            // TODO: When Port added first time, URI is not available
-            devTunnelResource.Annotations.Add(
-                    new EnvironmentCallbackAnnotation(
-                        name: $"DEV_TUNNEL_PORT_{port.PortNumber}_URL",
-                        callback: () => port.PortUri));
-
-            devTunnelResource.Annotations.Add(
-                new EndpointAnnotation(System.Net.Sockets.ProtocolType.Tcp)
-                {
-                    Port = port.PortNumber,
-                    TargetPort = port.PortNumber,
-                    Name = port.PortNumber.ToString(),
-                    IsProxied = false,
-                });
-
-            devTunnelResource.Annotations.Add(
-                new ResourceUrlsCallbackAnnotation(callback =>
-                    callback.Urls.Add(new() { DisplayText = port.PortNumber.ToString(), Url = port.PortUri })));
-
-            //devTunnelResource.Annotations.Add(new HealthCheckAnnotation(portResourceKey));
-        }
-
-        // TODO: Experiment with making this a `WithCommand` option for UI
-        // Get the auth token properties for the tunnel env vars
-        DevTunnelAccessInfo devTunnelAccessInfo = await devTunnelResource.GetAuthTokenAsync(cancellationToken);
-
-        devTunnelResource.Annotations.Add(
-            new EnvironmentCallbackAnnotation(env =>
-            {
-                env.Add("DEV_TUNNEL_AUTH_HEADER", "X-Tunnel-Authorization");
-                env.Add("DEV_TUNNEL_AUTH_TOKEN", devTunnelAccessInfo.Token);
-            }));
     }
 }
