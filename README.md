@@ -16,6 +16,21 @@ Prototype for .NET Aspire DevTunnel Feature
 - [Microsoft/Dev-Tunnels GitHub](https://github.com/microsoft/dev-tunnels)
 - [Microsoft Build - Advanced Dev Tunnel Features](https://www.youtube.com/watch?v=yCYLurylgj8)
 
+## API Surface
+
+[AspireDevTunnels.AppHost/Program.cs](./src/AspireDevTunnels.AppHost/Program.cs)
+
+```csharp
+// Creation of Dev Tunnel Resource
+IResourceBuilder<DevTunnelResource> devTunnelResource = builder
+    .AddDevTunnel("aspire-tunnel")
+    .WithExplicitStart(); // Remove this line for auto-start
+
+IResourceBuilder<ProjectResource> apiService =
+    builder.AddProject<Projects.AspireDevTunnels_ApiService>("apiservice")
+        .WithDevTunnel(devTunnelResource); // Add Service Port to DevTunnel
+```
+
 ## DevTunnel Dependency
 
 ### User Login
