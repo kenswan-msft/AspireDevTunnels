@@ -59,6 +59,10 @@ Dashboard Actions
 
 ![Dashboard Actions](./docs/images/AspireDashboard-Actions.png)
 
+Health Checks
+
+![Health Checks](./docs/images/AspireDashboard-HealthCheck.png)
+
 ## Sample CLI Responses
 
 Create Tunnel

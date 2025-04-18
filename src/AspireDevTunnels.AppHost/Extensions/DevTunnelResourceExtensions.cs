@@ -108,13 +108,19 @@ internal static class DevTunnelResourceExtensions
 
         List<string> commandLineArgs = DevTunnelCommandArgs.VerifyUserLoggedInArguments();
 
-        DevTunnelCommandResult devTunnelCommandResult =
-            await DevTunnelCommands.TryRunProcessAsync(commandLineArgs, cancellationToken);
+        DevTunnelUserInfo devTunnelUserInfo =
+            await DevTunnelCommands.RunProcessAsync<DevTunnelUserInfo>(commandLineArgs, cancellationToken);
 
-        if (!devTunnelCommandResult.IsSuccess)
+        // Exit code is still 0 when user is not logged in.
+        // Sample output: { "status": "Not logged in" }
+        if (devTunnelUserInfo.Status.Contains("Not logged in", StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException(
                 "No Logged In User detected. Please log in using 'devtunnel user login'.");
+        }
+        else
+        {
+            Console.WriteLine($"Logged In User: {devTunnelUserInfo.Username}");
         }
     }
 

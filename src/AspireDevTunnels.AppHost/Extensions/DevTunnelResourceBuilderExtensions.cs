@@ -1,4 +1,7 @@
-﻿using AspireDevTunnels.AppHost.Resources;
+﻿using AspireDevTunnels.AppHost.HealthChecks;
+using AspireDevTunnels.AppHost.Resources;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace AspireDevTunnels.AppHost.Extensions;
 
@@ -15,6 +18,7 @@ public static class DevTunnelResourceBuilderExtensions
                 .AddResource(devTunnelResource)
                 .WithArgs(["host"]);
 
+        // Startup events
         builder.Eventing.Subscribe<BeforeResourceStartedEvent>(
             devTunnelResource,
             async (context, cancellationToken) =>
@@ -32,6 +36,7 @@ public static class DevTunnelResourceBuilderExtensions
                 }
             });
 
+        // Dashboard Actions
         devTunnelResourceBuilder
             .WithCommand("allow-anonymous-access", "Make Endpoint Public", async (context) =>
              {
@@ -95,6 +100,21 @@ public static class DevTunnelResourceBuilderExtensions
                    return updateState.ResourceSnapshot.State?.Text != "Running" ? ResourceCommandState.Disabled : ResourceCommandState.Enabled;
                },
            });
+
+        // Establish Health Checks
+        string healthCheckKey = $"DevTunnelHealth_{name}";
+
+        builder.Services.AddHealthChecks()
+            .Add(new HealthCheckRegistration(
+              healthCheckKey,
+              sp => sp.GetKeyedService<DevTunnelHealthCheck>(healthCheckKey),
+              failureStatus: default,
+              tags: default,
+              timeout: TimeSpan.FromMinutes(2)));
+
+        builder.Services.AddKeyedSingleton(healthCheckKey, new DevTunnelHealthCheck(name));
+
+        devTunnelResourceBuilder.WithHealthCheck(healthCheckKey);
 
         return devTunnelResourceBuilder;
     }
