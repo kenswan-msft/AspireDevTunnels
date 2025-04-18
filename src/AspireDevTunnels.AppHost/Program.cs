@@ -2,7 +2,7 @@ using AspireDevTunnels.AppHost.Extensions;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-// Creation of new Dev Tunnel
+// Creation of Dev Tunnel
 IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder =
     builder.AddDevTunnel("aspire-tunnel", isPrivate: true);
 
@@ -13,6 +13,7 @@ IResourceBuilder<ProjectResource> apiService =
 
 builder.AddProject<Projects.AspireDevTunnels_Web>("webfrontend")
     .WithExternalHttpEndpoints()
+    // .WithDevTunnel(devTunnelResourceBuilder)
     .WithReference(apiService)
     .WaitFor(apiService);
 

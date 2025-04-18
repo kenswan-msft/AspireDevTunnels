@@ -28,11 +28,10 @@ Prototype for .NET Aspire DevTunnel Feature
 
 `devtunnel user login`
 
-## Issues
+## Pending Issues
 
 1. Temporary Tunnel support
-1. Public Tunnel support
-1. Dynamic port selection when not specified
+1. Dashboard Action Option: Enable Public Tunnel
 1. DevTunnel login support (currently depends on `devtunnel user login` before startup)
 
 ## Screenshots

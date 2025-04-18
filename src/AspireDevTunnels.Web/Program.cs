@@ -1,3 +1,4 @@
+using AspireDevTunnels.ServiceDefaults;
 using AspireDevTunnels.Web;
 using AspireDevTunnels.Web.Components;
 
