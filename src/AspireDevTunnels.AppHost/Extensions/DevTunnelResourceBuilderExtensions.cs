@@ -190,8 +190,6 @@ public static class DevTunnelResourceBuilderExtensions
                     continue;
                 }
 
-                string resourceUrlKey = parentResource.Name.ToUpper() + "_URL";
-
                 // Check if port already exists
                 DevTunnelPort devTunnelPort =
                     await devTunnelResource.GetPortDetailsAsync(endpoint.Port.Value, cancellationToken);
