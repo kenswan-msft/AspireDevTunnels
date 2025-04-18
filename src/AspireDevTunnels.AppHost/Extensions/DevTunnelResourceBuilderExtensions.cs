@@ -19,15 +19,25 @@ public static class DevTunnelResourceBuilderExtensions
             devTunnelResource,
             async (context, cancellationToken) =>
             {
-                // TODO: Detect Auto-Start (WithExplicitStart) and skip initialization first time if so
-                await InitializeTunnelAsync(devTunnelResource, cancellationToken);
-                await InitializePortsAsync(devTunnelResource, cancellationToken);
+                if (devTunnelResource.VerifyShouldInitialize())
+                {
+                    await InitializeTunnelAsync(devTunnelResource, cancellationToken);
+                    await InitializePortsAsync(devTunnelResource, cancellationToken);
+
+                    devTunnelResource.IsInitialized = true;
+                }
+                else
+                {
+                    devTunnelResource.SkippedInitializationForExplicitStart = true;
+                }
             });
 
         devTunnelResourceBuilder
             .WithCommand("allow-anonymous-access", "Make Endpoint Public", async (context) =>
              {
                  await devTunnelResource.AllowAnonymousAccessAsync(context.CancellationToken);
+
+                 devTunnelResource.IsPublic = true;
 
                  return new ExecuteCommandResult { Success = true };
 

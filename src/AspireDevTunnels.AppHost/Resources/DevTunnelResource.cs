@@ -12,7 +12,7 @@ public class DevTunnelResource(string name) : ExecutableResource(name, "devtunne
     /// Can be used to track the need to skip initialization of the tunnel
     /// (helps with "WithExplicitStart" triggering "BeforeResourceStartedEvent" lifecycle event more than once)
     /// </summary>
-    public bool SkipInitializationForAutoStart { get; set; }
+    public bool SkippedInitializationForExplicitStart { get; set; }
 
     /// <summary>
     /// Can be used to track if user has toggled public access option

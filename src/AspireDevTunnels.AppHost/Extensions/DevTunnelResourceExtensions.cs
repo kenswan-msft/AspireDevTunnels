@@ -117,4 +117,16 @@ internal static class DevTunnelResourceExtensions
                 "No Logged In User detected. Please log in using 'devtunnel user login'.");
         }
     }
+
+    public static bool VerifyShouldInitialize(
+        this DevTunnelResource devTunnelResource)
+    {
+        Console.WriteLine($"Detecting explicit startup properties for tunnel {devTunnelResource.Name}...");
+
+        ExplicitStartupAnnotation explicitStartAnnotation = devTunnelResource.Annotations
+            .OfType<ExplicitStartupAnnotation>()
+            .FirstOrDefault();
+
+        return explicitStartAnnotation is null || (devTunnelResource.SkippedInitializationForExplicitStart && !devTunnelResource.IsInitialized);
+    }
 }

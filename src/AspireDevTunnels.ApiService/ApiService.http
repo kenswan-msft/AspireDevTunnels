@@ -1,5 +1,5 @@
-#@baseAddress=https://localhost:7565
-@baseAddress=https://apiservice-tunnel-1234.usw2.devtunnels.ms
+@baseAddress=https://localhost:7565
+#@baseAddress=https://<tunnel>-7565.<cluster>.devtunnels.ms
 
 ### Get OpenApi Spec
 GET {{baseAddress}}/openapi/v1.json

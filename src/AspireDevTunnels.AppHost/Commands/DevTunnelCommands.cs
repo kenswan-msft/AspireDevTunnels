@@ -68,7 +68,7 @@ internal class DevTunnelCommands
                 default,
                 devTunnelCommandResult.Output,
                 errorMessage,
-                devTunnelCommandResult.ExitCode != 0
+                !devTunnelCommandResult.IsSuccess
                 ? devTunnelCommandResult.ExitCode
                 : -1);
         }
