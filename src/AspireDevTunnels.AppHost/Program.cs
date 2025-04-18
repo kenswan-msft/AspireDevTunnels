@@ -4,7 +4,7 @@ IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(ar
 
 // Creation of Dev Tunnel
 IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder =
-    builder.AddDevTunnel("aspire-tunnel", isPrivate: true);
+    builder.AddDevTunnel("aspire-tunnel");
 
 IResourceBuilder<ProjectResource> apiService =
     builder.AddProject<Projects.AspireDevTunnels_ApiService>("apiservice")

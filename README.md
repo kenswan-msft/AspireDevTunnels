@@ -31,7 +31,6 @@ Prototype for .NET Aspire DevTunnel Feature
 ## Pending Issues
 
 1. Temporary Tunnel support
-1. Dashboard Action Option: Enable Public Tunnel
 1. DevTunnel login support (currently depends on `devtunnel user login` before startup)
 
 ## Screenshots

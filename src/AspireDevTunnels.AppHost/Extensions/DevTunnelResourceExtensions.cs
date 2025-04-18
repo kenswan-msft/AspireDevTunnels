@@ -4,13 +4,14 @@ public static class DevTunnelResourceExtensions
 {
     public static IResourceBuilder<DevTunnelResource> AddDevTunnel(
         this IDistributedApplicationBuilder builder,
-        string name,
-        bool isPrivate = true)
+        string name)
     {
-        DevTunnelResource devTunnelResource = new(name, isPrivate);
+        DevTunnelResource devTunnelResource = new(name);
 
-        IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder = builder.AddResource(devTunnelResource)
-            .WithArgs(["host"]);
+        IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder =
+            builder
+                .AddResource(devTunnelResource)
+                .WithArgs(["host"]);
 
         builder.Eventing.Subscribe<BeforeResourceStartedEvent>(devTunnelResource,
             async (context, cancellationToken) =>
@@ -21,25 +22,33 @@ public static class DevTunnelResourceExtensions
                 devTunnelResource.Annotations.Add(
                     new EnvironmentCallbackAnnotation("DEV_TUNNEL_URL", () => devTunnelResource.TunnelUrl));
 
-                if (devTunnelResource.IsPrivate)
-                {
-                    string authToken = await devTunnelResource.GetAccessTokenAsync(cancellationToken);
+                string authToken = await devTunnelResource.GetAccessTokenAsync(cancellationToken);
 
-                    devTunnelResource.Annotations.Add(
-                        new EnvironmentCallbackAnnotation(env =>
-                        {
-                            env.Add("DEV_TUNNEL_AUTH_HEADER", "X-Tunnel-Authorization");
-                            env.Add("DEV_TUNNEL_AUTH_TOKEN", authToken);
-                        }));
-                }
-                else
-                {
-                    // TODO: Add as button on dashboard to make anonymous
-                    await devTunnelResource.AllowAnonymousAccessAsync(cancellationToken);
-                }
+                devTunnelResource.Annotations.Add(
+                    new EnvironmentCallbackAnnotation(env =>
+                    {
+                        env.Add("DEV_TUNNEL_AUTH_HEADER", "X-Tunnel-Authorization");
+                        env.Add("DEV_TUNNEL_AUTH_TOKEN", authToken);
+                    }));
 
                 Console.WriteLine($"Tunnel Initialized: {devTunnelResource.TunnelUrl}");
             });
+
+        // Add Public Tunnel Support
+        devTunnelResourceBuilder
+            .WithCommand("anonymous", "Make Endpoint Public", async (context) =>
+             {
+                 await devTunnelResource.AllowAnonymousAccessAsync(context.CancellationToken);
+
+                 return new ExecuteCommandResult
+                 {
+                     Success = true,
+                 };
+
+             }, commandOptions: new CommandOptions
+             {
+                 ConfirmationMessage = "Are you sure you want to make the dev tunnel publicly available?"
+             });
 
         return devTunnelResourceBuilder;
     }

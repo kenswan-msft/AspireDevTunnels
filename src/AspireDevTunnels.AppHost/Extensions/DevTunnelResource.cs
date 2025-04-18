@@ -1,12 +1,10 @@
 ﻿namespace AspireDevTunnels.AppHost.Extensions;
 
-public class DevTunnelResource(string name, bool isPrivate) : ExecutableResource(name, "devtunnel", "./")
+public class DevTunnelResource(string name) : ExecutableResource(name, "devtunnel", "./")
 {
     private readonly IDevTunnelProvider devTunnelProvider = new MsDevTunnel();
 
     public string TunnelUrl => devTunnelProvider.Url;
-
-    public bool IsPrivate => isPrivate;
 
     public async Task InitializeAsync(CancellationToken cancellationToken) =>
         await devTunnelProvider.CreateTunnelAsync(Name, cancellationToken);
