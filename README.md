@@ -51,6 +51,18 @@ OpenApi Spec Behind Tunnel
 
 ![DevTunnel Exposure](./docs/images/OpenApi-Spec-Behind-Tunnel.png)
 
+Enable Public Access Option
+
+![DevTunnel Exposure](./docs/images/Anonymous-Access.png)
+
+Anonymous Acceess Confirmation
+
+![DevTunnel Exposure](./docs/images/Anonymous-Access-Confirmation.png)
+
+Anonymous Acceess Success
+
+![DevTunnel Exposure](./docs/images/Anonymous-Access-Success.png)
+
 ## Sample CLI Responses
 
 Create Tunnel
