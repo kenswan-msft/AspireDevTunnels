@@ -6,8 +6,12 @@ public class DevTunnelResource(string name) : ExecutableResource(name, "devtunne
 
     public string TunnelUrl => devTunnelProvider.Url;
 
-    public async Task InitializeAsync(CancellationToken cancellationToken) =>
-        await devTunnelProvider.CreateTunnelAsync(Name, cancellationToken);
+    public async Task InitializeAsync(CancellationToken cancellationToken)
+    {
+        DevTunnel _ = await devTunnelProvider.CreateTunnelAsync(Name, cancellationToken);
+    }
+
+    public bool IsInitialized => devTunnelProvider.IsInitialized;
 
     public async Task<DevTunnelActivePort> AddPortAsync(int port, string protocol = "https", CancellationToken cancellationToken = default)
     {

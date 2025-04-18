@@ -7,15 +7,15 @@ internal class MsDevTunnel : IDevTunnelProvider
 {
     public string Id => tunnelId;
     public string Name => tunnelName;
-    public string Url => isInitialized ? GetTunnelUrl() : null;
+    public bool IsInitialized => !string.IsNullOrEmpty(tunnelId);
+    public string Url => IsInitialized ? GetTunnelUrl() : null;
 
     private string tunnelId;
     private string tunnelName;
 
-    private bool isInitialized => !string.IsNullOrEmpty(tunnelId);
     private readonly JsonSerializerOptions jsonSerializerOptions = new(JsonSerializerDefaults.Web);
 
-    public async Task CreateTunnelAsync(string tunnelName, CancellationToken cancellationToken = default)
+    public async Task<DevTunnel> CreateTunnelAsync(string tunnelName, CancellationToken cancellationToken = default)
     {
         this.tunnelName = tunnelName;
 
@@ -30,7 +30,7 @@ internal class MsDevTunnel : IDevTunnelProvider
 
             Console.WriteLine($"DevTunnel {tunnelName} already exists. Skipping creation.");
 
-            return;
+            return existingDevTunnel;
         }
 
         List<string> commandLineArgs = [
@@ -52,6 +52,8 @@ internal class MsDevTunnel : IDevTunnelProvider
         {
             throw new InvalidOperationException("Failed to create tunnel.");
         }
+
+        return devTunnel;
     }
 
     public async Task AddPortAsync(int port, string protocol = "https", CancellationToken cancellationToken = default)
@@ -241,7 +243,7 @@ internal class MsDevTunnel : IDevTunnelProvider
 
     private void CheckIsInitialized()
     {
-        if (!isInitialized)
+        if (!IsInitialized)
         {
             throw new InvalidOperationException("Tunnel must be initialized before starting. Use CreateTunnelAsync before starting the tunnel.");
         }

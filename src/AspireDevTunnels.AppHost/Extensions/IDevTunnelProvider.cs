@@ -8,7 +8,9 @@ public interface IDevTunnelProvider
 
     string Url { get; }
 
-    Task CreateTunnelAsync(string tunnelId, CancellationToken cancellationToken = default);
+    bool IsInitialized { get; }
+
+    Task<DevTunnel> CreateTunnelAsync(string tunnelId, CancellationToken cancellationToken = default);
 
     Task AddPortAsync(int port, string protocol = "https", CancellationToken cancellationToken = default);
 

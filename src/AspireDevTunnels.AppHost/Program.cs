@@ -1,10 +1,10 @@
-using AspireDevTunnels.AppHost.Extensions;
+﻿using AspireDevTunnels.AppHost.Extensions;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
 // Creation of Dev Tunnel
 IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder =
-    builder.AddDevTunnel("aspire-tunnel");
+    builder.AddDevTunnel("aspire-tunnel", autoStart: false);
 
 IResourceBuilder<ProjectResource> apiService =
     builder.AddProject<Projects.AspireDevTunnels_ApiService>("apiservice")
