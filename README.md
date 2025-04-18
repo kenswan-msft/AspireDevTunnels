@@ -11,12 +11,6 @@ Prototype for .NET Aspire DevTunnel Feature
 
 - [microsoft/dev-tunnels - GitHub](https://github.com/microsoft/dev-tunnels)
 
-## Key Files
-
-- [Feature Entry - Program.cs](./src/AspireDevTunnels.AppHost/Program.cs)
-- [Feature Integration - DevTunnelResourceExtensions.cs](./src/AspireDevTunnels.AppHost/Extensions/DevTunnelResourceExtensions.cs)
-- [Tunnel Implementations - MSDevTunnel.cs](./src/AspireDevTunnels.AppHost/Extensions/MSDevTunnel.cs)
-
 ## Resources
 
 - [Microsoft/Dev-Tunnels GitHub](https://github.com/microsoft/dev-tunnels)
@@ -27,11 +21,6 @@ Prototype for .NET Aspire DevTunnel Feature
 ### User Login
 
 `devtunnel user login`
-
-## Pending Issues
-
-1. Temporary Tunnel support
-1. DevTunnel login support (currently depends on `devtunnel user login` before startup)
 
 ## Screenshots
 
@@ -47,7 +36,7 @@ OpenApi Spec Behind Tunnel
 
 ![DevTunnel Exposure](./docs/images/OpenApi-Spec-Behind-Tunnel.png)
 
-Dashboard Options
+Dashboard Actions
 
 - Make Tunnel Endpoints Public
 - Get Active Port URLs
