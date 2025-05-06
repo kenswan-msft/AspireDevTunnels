@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "Version": {
+      "commandName": "Project",
+      "commandLineArgs": "--version",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "Start DevTunnel": {
+      "commandName": "Project",
+      "commandLineArgs": "start",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
