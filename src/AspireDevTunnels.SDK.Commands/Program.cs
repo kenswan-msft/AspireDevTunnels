@@ -66,14 +66,17 @@ public class Program
             new Option<string>("--id", ["-i"]) {
                 Required = true
             },
-            new Option<string>("--port", ["-p"]) {
+             new Option<string>("--cluster", ["-c"]) {
+                Required = true
+            },
+            new Option<int>("--port", ["-p"]) {
                 Required = true
             },
         };
-        addPortCommand.Action = CommandHandler.Create<string, int, IHost>(AddPortAsync);
+        addPortCommand.Action = CommandHandler.Create<string, string, int, IHost>(AddPortAsync);
         root.Subcommands.Add(addPortCommand);
 
-        // Start Dev Tunnel
+        // Get Access Token
         var accessTokenCommand = new Command("access-token", "Get DevTunnel Access Token")
         {
             new Option<string>("--id", ["-i"]) {
@@ -116,7 +119,6 @@ public class Program
         {
             TunnelManagementClient tunnelManagementClient = RetrieveTunnelManagementClient(host);
 
-            // List tunnels to infer the current user (tunnels are tied to the authenticated user)
             Tunnel[] tunnels =
                 await tunnelManagementClient.ListTunnelsAsync(
                     clusterId: null,
@@ -168,13 +170,14 @@ public class Program
         }
     }
 
-    private static async Task<int> AddPortAsync(string id, int port, IHost host)
+    private static async Task<int> AddPortAsync(string id, string cluster, int port, IHost host)
     {
         try
         {
             var tunnelRequest = new Tunnel
             {
                 TunnelId = id,
+                ClusterId = cluster,
                 Endpoints = [],
                 Ports = [],
             };
@@ -218,10 +221,18 @@ public class Program
                 Ports = [],
             };
 
+            var tunnelRequestOptions = new TunnelRequestOptions
+            {
+                IncludeAccessControl = true,
+                IncludePorts = true,
+                FollowRedirects = true,
+                TokenScopes = [TunnelAccessScopes.Connect],
+            };
+
             TunnelManagementClient tunnelManagementClient = RetrieveTunnelManagementClient(host);
 
             Tunnel tunnel =
-                await tunnelManagementClient.GetTunnelAsync(tunnelRequest, null, default);
+                await tunnelManagementClient.GetTunnelAsync(tunnelRequest, tunnelRequestOptions, default);
 
             bool retrievedAccessToken = tunnel.TryGetAccessToken(TunnelAccessScopes.Connect, out string accessToken);
 

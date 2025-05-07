@@ -34,14 +34,14 @@
     },
     "Action - Add Port": {
       "commandName": "Project",
-      "commandLineArgs": "add-port --id test-tunnel -p 5001",
+      "commandLineArgs": "add-port --id test-tunnel --cluster usw2 -p 5001",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
     "Action - Get Access Token": {
       "commandName": "Project",
-      "commandLineArgs": "access-token --id aspire-tunnel2 --cluster usw2",
+      "commandLineArgs": "access-token --id test-tunnel --cluster usw2",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
