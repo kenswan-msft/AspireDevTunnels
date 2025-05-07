@@ -17,6 +17,14 @@ internal class TunnelAuthorizationProvider(IConfiguration configuration)
         // Add scope to development json file
         // Found scope by running `devtunnel user show --verbose` in the terminal
         string tunnelScope = configuration.GetValue<string>("Authorization:Scope");
+
+        if (string.IsNullOrEmpty(tunnelScope))
+        {
+            throw new Exception(
+                "Tunnel scope is not set in the configuration. Please add Authorization:Scope to appsettings.json or appsettings.Development.json. " +
+                "Scope can be found by running `devtunnels user show --verbose` under Request Data -> Scope in the generated output");
+        }
+
         string savedToken = configuration.GetValue<string>(TUNNEL_AUTH_TOKEN_KEY);
         string savedTokenExpiration = configuration.GetValue<string>(TUNNEL_AUTH_TOKEN_EXPIRATION_KEY);
 
