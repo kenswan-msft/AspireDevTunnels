@@ -89,6 +89,19 @@ public class Program
         accessTokenCommand.Action = CommandHandler.Create<string, string, IHost>(GetAccessTokenAsync);
         root.Subcommands.Add(accessTokenCommand);
 
+        // Get Access Token
+        var allowAnonymousAccessCommand = new Command("allow-anonymous", "Make DevTunnel Public")
+        {
+            new Option<string>("--id", ["-i"]) {
+                Required = true
+            },
+            new Option<string>("--cluster", ["-c"]) {
+                Required = true
+            },
+        };
+        allowAnonymousAccessCommand.Action = CommandHandler.Create<string, string, IHost>(AllowAnonymousAccessAsync);
+        root.Subcommands.Add(allowAnonymousAccessCommand);
+
         return new CommandLineConfiguration(root);
     }
 
@@ -218,7 +231,7 @@ public class Program
                 TunnelId = id,
                 ClusterId = cluster,
                 Endpoints = [],
-                Ports = [],
+                Ports = []
             };
 
             var tunnelRequestOptions = new TunnelRequestOptions
@@ -242,7 +255,7 @@ public class Program
             }
             else
             {
-                Console.WriteLine("Access token not retrieved. Resource is public.");
+                Console.WriteLine("Access token not retrieved.");
             }
 
             return 0;
@@ -250,6 +263,53 @@ public class Program
         catch (Exception ex)
         {
             Console.WriteLine($"Error retrieving access token: {ex.Message}");
+
+            return 1;
+        }
+    }
+
+    private static async Task<int> AllowAnonymousAccessAsync(string id, string cluster, IHost host)
+    {
+        try
+        {
+            var tunnelRequest = new Tunnel
+            {
+                TunnelId = id,
+                ClusterId = cluster,
+                Endpoints = [],
+                AccessControl = new TunnelAccessControl
+                {
+                    Entries =
+                    [
+                        new TunnelAccessControlEntry
+                        {
+                            Type = TunnelAccessControlEntryType.Anonymous,
+                            Scopes = [TunnelAccessScopes.Connect],
+                        }
+                    ]
+                }
+            };
+
+            var tunnelRequestOptions = new TunnelRequestOptions
+            {
+                IncludeAccessControl = true,
+                IncludePorts = true,
+                FollowRedirects = true,
+                TokenScopes = [TunnelAccessScopes.Connect],
+            };
+
+            TunnelManagementClient tunnelManagementClient = RetrieveTunnelManagementClient(host);
+
+            Tunnel tunnel =
+                await tunnelManagementClient.CreateOrUpdateTunnelAsync(tunnelRequest, tunnelRequestOptions, default);
+
+            Console.WriteLine($"Anonymous access for tunnel {tunnel.TunnelId} has been granted");
+
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error making tunnel anonymous: {ex.Message}");
 
             return 1;
         }

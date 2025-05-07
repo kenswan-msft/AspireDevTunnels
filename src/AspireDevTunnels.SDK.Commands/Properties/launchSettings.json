@@ -45,6 +45,13 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "Action - Allow Anonymous": {
+      "commandName": "Project",
+      "commandLineArgs": "allow-anonymous --id test-tunnel --cluster usw2",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }
