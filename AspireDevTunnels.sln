@@ -20,9 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		global.json = global.json
-		NuGet.confg = NuGet.confg
 		README.md = README.md
+		NuGet.config = NuGet.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireDevTunnels.SDK.Commands", "src\AspireDevTunnels.SDK.Commands\AspireDevTunnels.SDK.Commands.csproj", "{2231E198-46E9-4865-8710-40C2A2C1022F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{8B5448CD-D827-5563-25B1-197BD87428A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B5448CD-D827-5563-25B1-197BD87428A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5448CD-D827-5563-25B1-197BD87428A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2231E198-46E9-4865-8710-40C2A2C1022F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2231E198-46E9-4865-8710-40C2A2C1022F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2231E198-46E9-4865-8710-40C2A2C1022F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2231E198-46E9-4865-8710-40C2A2C1022F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

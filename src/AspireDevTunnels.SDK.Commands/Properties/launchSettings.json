@@ -1,0 +1,65 @@
+{
+  "profiles": {
+    "Version": {
+      "commandName": "Project",
+      "commandLineArgs": "--version",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "Action - Authenticate": {
+      "commandName": "Project",
+      "commandLineArgs": "auth",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Action - List Tunnels": {
+      "commandName": "Project",
+      "commandLineArgs": "list",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Action - Create Tunnel": {
+      "commandName": "Project",
+      "commandLineArgs": "create --id test-tunnel",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Action - Add Port": {
+      "commandName": "Project",
+      "commandLineArgs": "add-port --id test-tunnel --cluster usw2 -p 5001",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Action - Get Access Token": {
+      "commandName": "Project",
+      "commandLineArgs": "token --id test-tunnel --cluster usw2",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Action - Allow Public Access": {
+      "commandName": "Project",
+      "commandLineArgs": "access --id test-tunnel --cluster usw2 --public",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+
+    "Action - Restrict Public Access": {
+      "commandName": "Project",
+      "commandLineArgs": "access --id test-tunnel --cluster usw2",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
