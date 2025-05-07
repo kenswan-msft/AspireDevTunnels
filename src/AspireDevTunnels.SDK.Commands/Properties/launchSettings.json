@@ -11,30 +11,37 @@
       "commandName": "Project",
       "commandLineArgs": "--help"
     },
-    "List Tunnels": {
+    "Action - Authenticate": {
+      "commandName": "Project",
+      "commandLineArgs": "auth",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Action - List Tunnels": {
       "commandName": "Project",
       "commandLineArgs": "list",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Create Tunnel": {
+    "Action - Create Tunnel": {
       "commandName": "Project",
       "commandLineArgs": "create --id test-tunnel",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Add Port": {
+    "Action - Add Port": {
       "commandName": "Project",
-      "commandLineArgs": "add-port -p 5001",
+      "commandLineArgs": "add-port --id test-tunnel -p 5001",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Start DevTunnel": {
+    "Action - Get Access Token": {
       "commandName": "Project",
-      "commandLineArgs": "start",
+      "commandLineArgs": "access-token --id aspire-tunnel2 --cluster usw2",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
