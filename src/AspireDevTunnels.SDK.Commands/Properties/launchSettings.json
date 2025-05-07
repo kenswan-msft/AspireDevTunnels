@@ -41,14 +41,22 @@
     },
     "Action - Get Access Token": {
       "commandName": "Project",
-      "commandLineArgs": "access-token --id test-tunnel --cluster usw2",
+      "commandLineArgs": "token --id test-tunnel --cluster usw2",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Action - Allow Anonymous": {
+    "Action - Allow Public Access": {
       "commandName": "Project",
-      "commandLineArgs": "allow-anonymous --id test-tunnel --cluster usw2",
+      "commandLineArgs": "access --id test-tunnel --cluster usw2 --public",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+
+    "Action - Restrict Public Access": {
+      "commandName": "Project",
+      "commandLineArgs": "access --id test-tunnel --cluster usw2",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

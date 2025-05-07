@@ -77,7 +77,7 @@ public class Program
         root.Subcommands.Add(addPortCommand);
 
         // Get Access Token
-        var accessTokenCommand = new Command("access-token", "Get DevTunnel Access Token")
+        var accessTokenCommand = new Command("token", "Get DevTunnel Access Token")
         {
             new Option<string>("--id", ["-i"]) {
                 Required = true
@@ -90,7 +90,7 @@ public class Program
         root.Subcommands.Add(accessTokenCommand);
 
         // Get Access Token
-        var allowAnonymousAccessCommand = new Command("allow-anonymous", "Make DevTunnel Public")
+        var accessCommand = new Command("access", "Make DevTunnel Public or Private")
         {
             new Option<string>("--id", ["-i"]) {
                 Required = true
@@ -98,9 +98,12 @@ public class Program
             new Option<string>("--cluster", ["-c"]) {
                 Required = true
             },
+            new Option<bool>("--public") {
+                Required = false,
+            }
         };
-        allowAnonymousAccessCommand.Action = CommandHandler.Create<string, string, IHost>(AllowAnonymousAccessAsync);
-        root.Subcommands.Add(allowAnonymousAccessCommand);
+        accessCommand.Action = CommandHandler.Create<string, string, bool, IHost>(ControlAccessAsync);
+        root.Subcommands.Add(accessCommand);
 
         return new CommandLineConfiguration(root);
     }
@@ -268,16 +271,14 @@ public class Program
         }
     }
 
-    private static async Task<int> AllowAnonymousAccessAsync(string id, string cluster, IHost host)
+    private static async Task<int> ControlAccessAsync(string id, string cluster, bool @public, IHost host)
     {
+        string action = @public == true ? "Public" : "Private";
+
         try
         {
-            var tunnelRequest = new Tunnel
-            {
-                TunnelId = id,
-                ClusterId = cluster,
-                Endpoints = [],
-                AccessControl = new TunnelAccessControl
+            TunnelAccessControl tunnelAccessControl = @public == true
+                ? new TunnelAccessControl
                 {
                     Entries =
                     [
@@ -288,6 +289,17 @@ public class Program
                         }
                     ]
                 }
+                : new TunnelAccessControl
+                {
+                    Entries = [],
+                };
+
+            var tunnelRequest = new Tunnel
+            {
+                TunnelId = id,
+                ClusterId = cluster,
+                Endpoints = [],
+                AccessControl = tunnelAccessControl
             };
 
             var tunnelRequestOptions = new TunnelRequestOptions
@@ -303,13 +315,13 @@ public class Program
             Tunnel tunnel =
                 await tunnelManagementClient.CreateOrUpdateTunnelAsync(tunnelRequest, tunnelRequestOptions, default);
 
-            Console.WriteLine($"Anonymous access for tunnel {tunnel.TunnelId} has been granted");
+            Console.WriteLine($"{action} access for tunnel {tunnel.TunnelId} has been granted");
 
             return 0;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error making tunnel anonymous: {ex.Message}");
+            Console.WriteLine($"Error making tunnel {action}: {ex.Message}");
 
             return 1;
         }
