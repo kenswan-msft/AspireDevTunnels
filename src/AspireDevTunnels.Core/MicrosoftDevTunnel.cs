@@ -2,6 +2,7 @@
 using Azure.Identity;
 using Microsoft.DevTunnels.Contracts;
 using Microsoft.DevTunnels.Management;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net.Http.Headers;
 
@@ -9,6 +10,7 @@ namespace AspireDevTunnels.Core;
 
 public class MicrosoftDevTunnel
 {
+    private readonly DevTunnelOptions devTunnelOptions;
     private readonly string scope;
     private readonly string tunnelId;
     private readonly TunnelManagementClient tunnelManagementClient;
@@ -16,10 +18,11 @@ public class MicrosoftDevTunnel
     private Tunnel? tunnel;
     private string? tunnelClusterId;
 
-    public MicrosoftDevTunnel(string tunnelId, string scope)
+    public MicrosoftDevTunnel(string tunnelId, string scope, DevTunnelOptions devTunnelOptions)
     {
         this.tunnelId = tunnelId;
         this.scope = scope;
+        this.devTunnelOptions = devTunnelOptions;
         tunnelManagementClient = GenerateAuthorizedClient();
     }
 
@@ -27,12 +30,7 @@ public class MicrosoftDevTunnel
     {
         try
         {
-            var tunnelRequest = new Tunnel
-            {
-                TunnelId = tunnelId,
-                Endpoints = [],
-                Ports = []
-            };
+            var tunnelRequest = new Tunnel { TunnelId = tunnelId };
 
             tunnel =
                 await tunnelManagementClient.CreateOrUpdateTunnelAsync(
@@ -62,9 +60,7 @@ public class MicrosoftDevTunnel
             var tunnelRequest = new Tunnel
             {
                 TunnelId = tunnelId,
-                ClusterId = tunnelClusterId,
-                Endpoints = [],
-                Ports = []
+                ClusterId = tunnelClusterId
             };
 
             tunnel =
@@ -96,50 +92,14 @@ public class MicrosoftDevTunnel
         }
     }
 
-    public async Task<TunnelPort?> GetActivePortAsync(int port, CancellationToken cancellationToken)
+    public async Task<TunnelPort[]> GetActivePortsAsync(CancellationToken cancellationToken)
     {
         try
         {
             var tunnelRequest = new Tunnel
             {
                 TunnelId = tunnelId,
-                ClusterId = tunnelClusterId,
-                Endpoints = [],
-                Ports = []
-            };
-
-            var tunnelRequestOptions = new TunnelRequestOptions
-            {
-                IncludePorts = true,
-                TokenScopes = [TunnelAccessScopes.Connect]
-            };
-
-            tunnel =
-                await tunnelManagementClient.GetTunnelAsync(
-                    tunnelRequest,
-                    tunnelRequestOptions,
-                    cancellationToken);
-
-            return tunnel.Ports.FirstOrDefault(p => p.PortNumber == (ushort)port);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving active port: {ex.Message}");
-
-            throw;
-        }
-    }
-
-    public async Task<TunnelEndpoint[]> GetActiveEndpointsAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var tunnelRequest = new Tunnel
-            {
-                TunnelId = tunnelId,
-                ClusterId = tunnelClusterId,
-                Endpoints = [],
-                Ports = []
+                ClusterId = tunnelClusterId
             };
 
             var tunnelRequestOptions = new TunnelRequestOptions
@@ -156,7 +116,7 @@ public class MicrosoftDevTunnel
                     tunnelRequestOptions,
                     cancellationToken);
 
-            TunnelEndpoint[] tunnelEndpoints = [.. tunnel.Endpoints];
+            TunnelPort[] tunnelEndpoints = [.. tunnel.Ports];
 
             Console.WriteLine($"Tunnel '{tunnel.TunnelId}' has been retrieved with {tunnelEndpoints.Length} active ports.");
 
@@ -196,11 +156,8 @@ public class MicrosoftDevTunnel
                     tunnelRequestOptions,
                     cancellationToken);
 
-            bool retrievedAccessToken =
+            bool _ =
                 tunnel.TryGetAccessToken(TunnelAccessScopes.Connect, out string accessToken);
-
-            Console.WriteLine(
-                retrievedAccessToken ? $"X-Tunnel-Authorization: tunnel {accessToken}" : "Access token not retrieved.");
 
             return accessToken;
         }
@@ -294,6 +251,11 @@ public class MicrosoftDevTunnel
                     }
                 }
 
+                if (devTunnelOptions.HasValidAuthToken)
+                {
+                    return new("Bearer", devTunnelOptions.AuthToken);
+                }
+
                 accessTokenCache = await RefreshAuthorizationTokenAsync();
 
                 return new("Bearer", accessTokenCache.Value.Token);
@@ -309,6 +271,43 @@ public class MicrosoftDevTunnel
         AccessToken accessToken =
             await credential.GetTokenAsync(new(scopes));
 
+        await AddTunnelSecretAsync(
+            $"{nameof(DevTunnelOptions)}:{nameof(DevTunnelOptions.AuthToken)}",
+            accessToken.Token);
+
+        await AddTunnelSecretAsync(
+            $"{nameof(DevTunnelOptions)}:{nameof(DevTunnelOptions.AuthTokenExpiration)}",
+            accessToken.ExpiresOn.UtcDateTime.ToString("o"));
+
         return accessToken;
+    }
+
+    private static async Task AddTunnelSecretAsync(string key, string value)
+    {
+        using Process process = new();
+
+        process.StartInfo = new()
+        {
+            FileName = "dotnet",
+            Arguments = string.Join(" ", "user-secrets", "set", key, value, "--id", "2a8148bb-c953-42d9-bd12-0d3ed993a6b3"),
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        process.Start();
+
+        string output = await process.StandardOutput.ReadToEndAsync();
+        string error = await process.StandardError.ReadToEndAsync();
+
+        await process.WaitForExitAsync();
+
+        if (process.ExitCode != 0)
+        {
+            throw new($"Error setting user secret: {error}");
+        }
+
+        Console.WriteLine($"User secret set successfully: {output}");
     }
 }

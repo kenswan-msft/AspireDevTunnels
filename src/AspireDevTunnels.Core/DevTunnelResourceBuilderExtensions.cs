@@ -1,4 +1,5 @@
 ﻿using Microsoft.DevTunnels.Contracts;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AspireDevTunnels.Core;
@@ -7,10 +8,12 @@ public static class DevTunnelResourceBuilderExtensions
 {
     public static IResourceBuilder<DevTunnelResource> AddDevTunnel(
         this IDistributedApplicationBuilder builder,
-        string name,
-        string scope)
+        string name)
     {
-        DevTunnelResource devTunnelResource = new(name, scope);
+        DevTunnelOptions devTunnelOptions =
+            builder.Configuration.GetSection(nameof(DevTunnelOptions)).Get<DevTunnelOptions>();
+
+        DevTunnelResource devTunnelResource = new(name, devTunnelOptions.Scope, devTunnelOptions);
 
         IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder =
             builder
@@ -50,14 +53,16 @@ public static class DevTunnelResourceBuilderExtensions
             .WithCommand(
                 "get-tunnel-urls", "Get URLs", async context =>
                 {
-                    TunnelEndpoint[] tunnelEndpoints =
-                        await devTunnelResource.Tunnel.GetActiveEndpointsAsync(context.CancellationToken);
+                    TunnelPort[] tunnelPorts =
+                        await devTunnelResource.Tunnel.GetActivePortsAsync(context.CancellationToken);
 
                     Console.WriteLine($"Tunnel {devTunnelResource.Name} URLs:");
 
-                    foreach (TunnelEndpoint tunnelEndpoint in tunnelEndpoints)
+                    foreach (TunnelPort tunnelPort in tunnelPorts)
                     {
-                        Console.WriteLine($"Tunnel URL: {tunnelEndpoint.TunnelUri}");
+                        Console.WriteLine("------------------------------------------------------");
+                        Console.WriteLine($"Tunnel URL: {tunnelPort.PortForwardingUris.First()}");
+                        Console.WriteLine($"Tunnel Inspection URL: {tunnelPort.InspectionUri}");
                     }
 
                     return new() { Success = true };
@@ -162,22 +167,22 @@ public static class DevTunnelResourceBuilderExtensions
                 }
 
                 // Check if port already exists
-                TunnelPort devTunnelPort =
-                    await devTunnelResource.Tunnel.GetActivePortAsync(endpoint.Port.Value, cancellationToken);
-
-                if (devTunnelPort is not null)
-                {
-                    Console.WriteLine($"Port {endpoint.Port.Value} already exists for tunnel {devTunnelResource.Name}");
-                }
-                else
-                {
-                    // Add port to tunnel
-                    TunnelPort devTunnelActivePort =
-                        await devTunnelResource.Tunnel.AddPortAsync(
-                            endpoint.Port.Value,
-                            endpoint.UriScheme,
-                            cancellationToken);
-                }
+                // TunnelPort devTunnelPort =
+                //     await devTunnelResource.Tunnel.GetActivePortAsync(endpoint.Port.Value, cancellationToken);
+                //
+                // if (devTunnelPort is not null)
+                // {
+                //     Console.WriteLine($"Port {endpoint.Port.Value} already exists for tunnel {devTunnelResource.Name}");
+                // }
+                // else
+                // {
+                // Add port to tunnel
+                TunnelPort _ =
+                    await devTunnelResource.Tunnel.AddPortAsync(
+                        endpoint.Port.Value,
+                        endpoint.UriScheme,
+                        cancellationToken);
+                // }
             }
         }
     }

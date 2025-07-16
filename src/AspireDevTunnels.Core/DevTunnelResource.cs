@@ -1,6 +1,7 @@
 ﻿namespace AspireDevTunnels.Core;
 
-public class DevTunnelResource(string name, string scope) : ExecutableResource(name, "devtunnel", "./")
+public class DevTunnelResource(string name, string scope, DevTunnelOptions devTunnelOptions)
+    : ExecutableResource(name, "devtunnel", "./")
 {
     /// <summary>
     ///     Can be used to track initialization of the tunnel
@@ -19,5 +20,5 @@ public class DevTunnelResource(string name, string scope) : ExecutableResource(n
     /// </summary>
     public bool IsPublic { get; set; }
 
-    internal MicrosoftDevTunnel Tunnel { get; } = new(name, scope);
+    internal MicrosoftDevTunnel Tunnel { get; } = new(name, scope, devTunnelOptions);
 }

@@ -1,5 +1,5 @@
-﻿using AspireDevTunnels.AppHost.Extensions;
-using AspireDevTunnels.AppHost.Resources;
+﻿using AspireDevTunnels.Core;
+using Projects;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
@@ -9,11 +9,11 @@ IResourceBuilder<DevTunnelResource> devTunnelResource = builder
     .WithExplicitStart(); // Remove this line for auto-start
 
 IResourceBuilder<ProjectResource> apiService =
-    builder.AddProject<Projects.AspireDevTunnels_ApiService>("apiservice")
+    builder.AddProject<AspireDevTunnels_ApiService>("apiservice")
         // DevTunnel Port Binding
         .WithDevTunnel(devTunnelResource);
 
-builder.AddProject<Projects.AspireDevTunnels_Web>("webfrontend")
+builder.AddProject<AspireDevTunnels_Web>("webfrontend")
     .WithExternalHttpEndpoints()
     // .WithDevTunnel(devTunnelResource)
     .WithReference(apiService)
