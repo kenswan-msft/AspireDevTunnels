@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.2.0" />
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspireDevTunnels.ApiService\AspireDevTunnels.ApiService.csproj" />
+    <ProjectReference Include="..\AspireDevTunnels.Core\AspireDevTunnels.Core.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\AspireDevTunnels.Web\AspireDevTunnels.Web.csproj" />
   </ItemGroup>
 
