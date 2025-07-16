@@ -120,8 +120,6 @@ public static class DevTunnelResourceBuilderExtensions
         IResourceBuilder<DevTunnelResource> devTunnelResourceBuilder)
         where T : IResourceWithEndpoints
     {
-        // TODO: Check port limits (how many ports per tunnel allowed)
-
         // Add new Port for associated resource
         IEnumerable<EndpointReference> endpoints = resourceBuilder.Resource.GetEndpoints()
             .Where(endpoint => endpoint.Scheme == "https");
@@ -166,23 +164,11 @@ public static class DevTunnelResourceBuilderExtensions
                     continue;
                 }
 
-                // Check if port already exists
-                // TunnelPort devTunnelPort =
-                //     await devTunnelResource.Tunnel.GetActivePortAsync(endpoint.Port.Value, cancellationToken);
-                //
-                // if (devTunnelPort is not null)
-                // {
-                //     Console.WriteLine($"Port {endpoint.Port.Value} already exists for tunnel {devTunnelResource.Name}");
-                // }
-                // else
-                // {
-                // Add port to tunnel
                 TunnelPort _ =
                     await devTunnelResource.Tunnel.AddPortAsync(
                         endpoint.Port.Value,
                         endpoint.UriScheme,
                         cancellationToken);
-                // }
             }
         }
     }
